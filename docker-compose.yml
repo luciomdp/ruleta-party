@@ -1,0 +1,27 @@
+services:
+  ruleta-party:
+    container_name: ruleta-party
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "127.0.0.1:3004:3000"
+
+    volumes:
+      - ./public:/app/public
+      - ./src:/app/src
+      - ./eslint.config.mjs:/app/eslint.config.mjs
+      - ./next.config.js:/app/next.config.js
+      - ./package.json:/app/package.json
+      - ./postcss.config.mjs:/app/postcss.config.mjs
+      - ./tsconfig.json:/app/tsconfig.json
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    command: sh -c "npm run dev"
+    networks:
+      - Publica
+  
+networks:
+    Publica:
+        external: true
