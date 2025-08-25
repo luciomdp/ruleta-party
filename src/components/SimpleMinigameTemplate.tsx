@@ -1,4 +1,4 @@
-// src/components/MinigameTemplate.tsx
+// src/components/SimpleMinigameTemplate.tsx
 'use client';
 
 import { ReactNode } from 'react';
@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation';
 
 type Props = {
   title: string;
-  description: ReactNode; // texto o JSX
-  actionLabel?: string;   // default: "Eliminar jugador"
+  description: ReactNode;
+  actionLabel?: string;
+  actionDisabled?: boolean;         // NUEVO
+  aboveAction?: ReactNode;          // NUEVO
   className?: string;
 };
 
@@ -15,6 +17,8 @@ export default function SimpleMinigameTemplate({
   title,
   description,
   actionLabel = 'Eliminar jugador',
+  actionDisabled,
+  aboveAction,
   className,
 }: Props) {
   const router = useRouter();
@@ -32,10 +36,16 @@ export default function SimpleMinigameTemplate({
           </div>
         </section>
 
+        {aboveAction}
+
         <footer className="pt-2">
           <button
             onClick={() => router.push('/elimination')}
-            className="w-full rounded-xl py-3 font-semibold bg-rose-500/90 hover:bg-rose-600/90 active:bg-rose-700/90 border border-white/10 shadow-lg"
+            disabled={!!actionDisabled}
+            className={`w-full rounded-xl py-3 font-semibold border shadow-lg transition
+              ${actionDisabled
+                ? 'bg-white/20 text-white/60 border-white/20 cursor-not-allowed'
+                : 'bg-rose-500/90 hover:bg-rose-600/90 active:bg-rose-700/90 border-white/10'}`}
           >
             {actionLabel}
           </button>

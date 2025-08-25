@@ -15,7 +15,7 @@ export const SLICES: Slice[] = [
     label: 'Historia rota',
     color: '#F472B6',
     iconSrc: '/icons/book.png',
-    weight: 1
+    weight: 5
   },
   {
     key: SliceKey.HandsGame, 
