@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useGameStore } from '@/store/useGameStore';
 import { gradientBg, glassBtn } from '@/ui/theme';
 import { SLICES } from '@/lib/slices';
-import type { SliceKey } from '@/lib/types';
+import { SliceKey } from '@/lib/types';
 import ConfirmModal from '@/components/ConfirmModal';
 import dynamic from 'next/dynamic';
 
@@ -36,11 +36,12 @@ export default function RoulettePage() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleResult = (key: SliceKey) => {
-    if (key === 'revivir') {
+    if (key === SliceKey.Revive) {
       if (dead.length) reviveRandom();
       return;
     }
-    router.push(`/minigames/${key}`);
+    // Navegar a la ruta del minijuego
+    router.push(`${SLICES.find(s => s.key === key)?.path}`); 
   };
 
   const resetGame = () => {

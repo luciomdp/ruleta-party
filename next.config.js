@@ -3,6 +3,9 @@
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
+  allowedDevOrigins: [
+    'http://ruleta-party.local.dev',
+  ],
   webpack: (config, { dev }) => {
     if (dev) {
       config.watchOptions = {
@@ -13,6 +16,5 @@ const nextConfig = {
     return config
   },
 }
-
 
 module.exports = nextConfig

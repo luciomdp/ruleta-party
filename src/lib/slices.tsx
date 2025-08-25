@@ -1,24 +1,44 @@
-import { Slice } from "./types";
+import { Slice, SliceKey } from "./types";
 
 export const SLICES: Slice[] = [
   {
-    key: 'codigo', label: 'Código oculto', color: '#A78BFA',
-    iconSrc: '/icons/enigma.png'
+    key: SliceKey.SecretCode, 
+    path: '/minigames/secret-code',
+    label: 'Código oculto', 
+    color: '#A78BFA',
+    iconSrc: '/icons/enigma.png',
+    weight: 1
   },
   {
-    key: 'historia', label: 'Historia rota', color: '#F472B6',
-    iconSrc: '/icons/book.png'
+    key: SliceKey.BrokenStory, 
+    path: '/minigames/broken-story',
+    label: 'Historia rota',
+    color: '#F472B6',
+    iconSrc: '/icons/book.png',
+    weight: 1
   },
   {
-    key: 'manos', label: 'Juego de manos', color: '#34D399',
-    iconSrc: '/icons/rock-paper-scissors.png'
+    key: SliceKey.HandsGame, 
+    path: '/minigames/hands-game',
+    label: 'Juego de manos', 
+    color: '#34D399',
+    iconSrc: '/icons/rock-paper-scissors.png',
+    weight: 1
   },
   {
-    key: 'rey', label: 'Muerte al Rey', color: '#FBBF24',
-    iconSrc: '/icons/king.png'
+    key: SliceKey.KillTheKing, 
+    path: '/minigames/kill-the-king',
+    label: 'Muerte al Rey', 
+    color: '#FBBF24',
+    iconSrc: '/icons/king.png',
+    weight: 1
   },
   {
-    key: 'revivir', label: 'De entre los muertos', color: '#60A5FA',
-    iconSrc: '/icons/grave.png'
+    key: SliceKey.Revive, 
+    path: '',
+    label: 'De entre los muertos', 
+    color: '#60A5FA',
+    iconSrc: '/icons/grave.png',
+    weight: 0.2
   },
 ];
