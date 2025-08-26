@@ -65,9 +65,9 @@ export default function RoulettePage() {
           className="flex flex-col items-center gap-4"
         />
         
-        <div className="h-32 overflow-y-auto pr-1 pb-2 scroll-pb-4">
+        <div className="h-32 overflow-y-auto pr-1 pb-2 scroll-pb-2">
           <h3 className="text-white/70 text-sm mb-2">En juego</h3>
-          <ul className="flex gap-2 flex-wrap /* sin mb-4 acá */">
+          <ul className="flex gap-2 flex-wrap">
             {alive.map(n => (
               <li key={n} className="px-3 py-1 rounded-full text-sm bg-white/10">
                 {n}
