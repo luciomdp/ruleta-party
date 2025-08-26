@@ -6,16 +6,11 @@ import { useRouter } from 'next/navigation';
 import { useGameStore, Phase } from '@/store/useGameStore';
 import TurnModal from '@/components/TurnModal';
 
-//TODO poner en 20
+
 const TURN_SECONDS = 2;
 
 export default function BrokenStoryPage() {
   const router = useRouter();
-
-  // store
-  const story      = useGameStore(s => s.currentStory);
-  //TODO: Fix [storie]: <Resolver el problema de que no se actualiza la historia entre rondas>
-  const ensureSeed = useGameStore(s => s.ensureStory);
   
   const players     = useGameStore(s => s.alive);
   const turnIndex   = useGameStore(s => s.bsTurnIndex);
@@ -23,13 +18,18 @@ export default function BrokenStoryPage() {
   const resetTurns  = useGameStore(s => s.bsReset);
   const setPhase    = useGameStore(s => s.setPhase);
 
-  // local
+  const story = useGameStore(s => s.currentStory());
+  const advanceStory = useGameStore(s => s.advanceStory);
+
   const [playing, setPlaying] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TURN_SECONDS);
 
-  useEffect(() => { 
-    if (!story) ensureSeed();
-  }, [story, ensureSeed]);
+  const onRoundEnd = () => {
+    console.log("Avanzo historia y elimino");
+    setPhase(Phase.Elimination);
+    advanceStory();
+    router.push('/elimination');
+  }
 
   // si cambia la lista de jugadores, resetear turnos
   useEffect(() => { 
@@ -104,7 +104,7 @@ export default function BrokenStoryPage() {
           )}
 
           <button
-            onClick={() => { setPhase(Phase.Elimination); router.push('/elimination'); }}
+            onClick={onRoundEnd}
             disabled={!allPlayed}
             className={`w-full rounded-xl py-3 font-semibold border shadow transition
               ${!allPlayed
@@ -119,7 +119,7 @@ export default function BrokenStoryPage() {
       <TurnModal
         open={playing}
         playerName={currentName}
-        story={story}
+        story={story ?? ''}
         timeLeft={timeLeft}
       />
     </main>

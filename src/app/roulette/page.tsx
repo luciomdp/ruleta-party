@@ -7,23 +7,7 @@ import { gradientBg, glassBtn } from '@/ui/theme';
 import { SLICES } from '@/lib/slices';
 import { SliceKey } from '@/lib/types';
 import ConfirmModal from '@/components/ConfirmModal';
-import dynamic from 'next/dynamic';
-
-const Roulette = dynamic(() => import('@/components/Roulette'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex flex-col items-center gap-4">
-      <h2 className="text-3xl font-extrabold drop-shadow">Ruleta</h2>
-      <div className="w-72 h-72 rounded-full bg-white/10 animate-pulse border border-white/20" />
-      <button
-        disabled
-        className="mt-5 px-6 py-3 rounded-xl font-semibold border border-white/30 bg-white/30 text-white/60 cursor-not-allowed"
-      >
-        Cargando…
-      </button>
-    </div>
-  ),
-});
+import Roulette from '@/components/Roulette';
 
 export default function RoulettePage() {
   const router = useRouter();

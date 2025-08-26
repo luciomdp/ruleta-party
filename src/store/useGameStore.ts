@@ -2,15 +2,8 @@
 'use client';
 import { create } from 'zustand';
 import { toast } from 'react-hot-toast';
+import shuffle from 'lodash.shuffle';
 import { STORY_SEEDS } from '@/lib/stories';
-
-const shuffle = <T,>(a: T[]) => { 
-  for (let i=a.length-1;i>0;i--){ 
-    const j=Math.floor(Math.random()*(i+1)); 
-    [a[i],a[j]]=[a[j],a[i]]; 
-  } 
-  return a; 
-};
 
 export enum Phase {
   Lobby = 'lobby',
@@ -26,20 +19,22 @@ type GameState = {
   phase: Phase;
   round: number;
   setPhase: (p: Phase) => void;         
-  setNames: (names: string[]) => void;
+  innitGame: (names: string[]) => void;
   eliminate: (name: string) => void;
   reviveRandom: () => void;
   nextRound: () => void;
   reset: () => void;
 
-  // --- Broken Story slice ---
-  storyDeck: number[];
-  currentStory?: string;
-  storyDrawn: boolean;          
-  ensureStory: () => void; 
-  bsTurnIndex: number;                    // NUEVO
-  bsReset: () => void;                    // NUEVO
-  bsNext: () => void;                     // NUEVO
+  //___ Broken Story slice ___
+  storyDeck: typeof STORY_SEEDS;
+  storyIndex: number;
+  currentStory: () => (typeof STORY_SEEDS)[number] | null;
+  advanceStory: () => void;
+
+  //___ Turn handling ___
+  bsTurnIndex: number;                    
+  bsReset: () => void;                   
+  bsNext: () => void;                     
 };
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -50,8 +45,16 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   setPhase: (p) => set({ phase: p }),
 
-  setNames: (names) =>
-    set({ alive: names, dead: [], phase: Phase.Roulette, round: 1, storyDrawn: false }),
+  innitGame: (names) =>
+    set({
+      alive: names,
+      dead: [],
+      phase: Phase.Roulette,
+      round: 1,
+      // inicializa historias al arrancar la partida
+      storyDeck: shuffle(STORY_SEEDS),
+      storyIndex: 0,
+    }),
 
   eliminate: (name) =>
     set((s) => ({
@@ -77,32 +80,18 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   nextRound: () => set((s) => ({ round: s.round + 1 })),
 
-  reset: () => set({ alive: [], dead: [], phase: Phase.Lobby, round: 1, storyDrawn: false }),
+  reset: () => set({ alive: [], dead: [], phase: Phase.Lobby, round: 1, bsTurnIndex: 0}),
 
-  storyDeck: shuffle([...Array(STORY_SEEDS.length).keys()]),
-  currentStory: undefined,
-  storyDrawn: false,
-
-  ensureStory: () => {
-    set((s) => {
-      if (s.storyDrawn) return s;
-
-      // init deck si está vacío
-      const deck = s.storyDeck.length
-        ? s.storyDeck.slice()
-        : shuffle([...Array(STORY_SEEDS.length).keys()]);
-
-      const [i, ...rest] = deck;
-      const text = STORY_SEEDS[i];
-
-      return {
-        storyDeck: rest,
-        currentStory: text,
-        storyDrawn: true,
-      };
-    });
+  storyDeck: [] as unknown as typeof STORY_SEEDS,
+  storyIndex: 0,
+  currentStory: () => {
+    const { storyDeck, storyIndex } = get();
+    return storyDeck[storyIndex] ?? null;
   },
-
+  advanceStory: () => {
+    const { storyDeck, storyIndex } = get();
+    if (storyIndex < storyDeck.length) set({ storyIndex: storyIndex + 1 });
+  },
   bsTurnIndex: 0,
   bsReset: () => set({ bsTurnIndex: 0 }),
   bsNext: () => set(s => ({ bsTurnIndex: s.bsTurnIndex + 1 })),

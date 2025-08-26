@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "lodash.shuffle": "^4.2.0",
     "next": "15.4.5",
     "react": "19.1.0",
     "react-custom-roulette": "^1.4.1",
@@ -19,6 +20,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/lodash.shuffle": "^4.2.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

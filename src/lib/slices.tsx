@@ -10,13 +10,13 @@ export const SLICES: Slice[] = [
     weight: 1
   },
 
-  {//TODO: Poner en 1
+  {
     key: SliceKey.BrokenStory, 
     path: '/minigames/broken-story',
     label: 'Historia rota',
     color: '#F472B6',
     iconSrc: '/icons/book.png',
-    weight: 100
+    weight: 1
   },
   {
     key: SliceKey.HandsGame, 
