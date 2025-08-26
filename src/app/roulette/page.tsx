@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGameStore } from '@/store/useGameStore';
 import { gradientBg, glassBtn } from '@/ui/theme';
@@ -12,12 +12,19 @@ import Roulette from '@/components/Roulette';
 export default function RoulettePage() {
   const router = useRouter();
 
+  const alive        = useGameStore(s => s.alive);
   const round        = useGameStore(s => s.round);
   const dead         = useGameStore(s => s.dead);
   const reviveRandom = useGameStore(s => s.reviveRandom);
   const reset        = useGameStore(s => s.reset);
 
   const [showConfirm, setShowConfirm] = useState(false);
+
+  useEffect(() => {
+    if (alive.length > 3) return;
+    // Cuando quedan 3 jugadores, comienza el clash battle
+    router.push('/final-clash');
+  }, [alive, router]);
 
   const handleResult = (key: SliceKey) => {
     if (key === SliceKey.Revive) {

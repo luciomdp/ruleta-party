@@ -9,22 +9,22 @@ export const SLICES: Slice[] = [
     iconSrc: '/icons/enigma.png',
     weight: 1
   },
-  //TODO cambiar peso a 1
   {
     key: SliceKey.BrokenStory, 
     path: '/minigames/broken-story',
     label: 'Historia rota',
     color: '#F472B6',
     iconSrc: '/icons/book.png',
-    weight: 100
+    weight: 1
   },
+  //TODO cambiar a 1
   {
     key: SliceKey.HandsGame, 
     path: '/minigames/hands-game',
     label: 'Juego de manos', 
     color: '#34D399',
     iconSrc: '/icons/rock-paper-scissors.png',
-    weight: 1
+    weight: 100
   },
   {
     key: SliceKey.KillTheKing, 

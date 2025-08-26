@@ -6,8 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useGameStore, Phase } from '@/store/useGameStore';
 import TurnModal from '@/components/TurnModal';
 
-//TODO cambiar a 20
-const TURN_SECONDS = 2;
+const TURN_SECONDS = 20;
 
 export default function BrokenStoryPage() {
   const router = useRouter();
