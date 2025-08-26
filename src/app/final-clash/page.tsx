@@ -157,7 +157,7 @@ export default function FinalClashPage() {
           </div>
         </header>
 
-        <p>Los 3 finalistas compiten por llevarse la <span className='font-bold'>Ruleta Crown 👑</span><br></br>Cada uno tiene 10 segundos para decir una palabra que comience con la letra en pantalla ¡Sin repetir! </p>
+        <p>Los 3 finalistas compiten por llevarse la <span className='font-bold'>Corona Ruleta 👑</span><br></br>Cada uno tiene 10 segundos para decir una palabra que comience con la letra en pantalla <span className='font-bold'> ¡No vale repetir!</span> </p>
 
         {/* área principal*/}
         <div className="flex-1 flex items-center justify-center">
@@ -169,12 +169,12 @@ export default function FinalClashPage() {
         </div>
 
         <div className="w-full flex flex-col items-center gap-4">
-          <div className="text-white/80">
-            Jugador actual: <span className="font-bold">{currentPlayer || '—'}</span>
-          </div>
           <button className={`px-5 py-3 ${glassBtn}`} onClick={onButtonClick}>
             {buttonLabel}
           </button>
+          <div className="text-white/80">
+            Jugador actual: <span className="font-bold">{currentPlayer || '—'}</span>
+          </div>
           <p className="text-xs text-white/60">
             Si se agota el tiempo, se elimina automáticamente.
           </p>

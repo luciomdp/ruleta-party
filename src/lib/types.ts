@@ -16,3 +16,8 @@ export type Slice = {
   iconSrc: string;
   weight?: number; // probabilidad relativa, default 1
 };
+
+export type WordPair = { 
+  common: string; 
+  impostor: string 
+};
