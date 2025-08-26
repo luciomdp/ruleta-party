@@ -13,10 +13,13 @@ export default function Lobby() {
   const router = useRouter();
 
   const addPlayer = () => {
-    if (name.trim()) {
-      setPlayers([...players, name.trim()]);
-      setName('');
+    if (!name.trim()) return; 
+    if (players.includes(name.trim())) {
+      toast.error('El jugador ya fue agregado');
+      return;
     }
+    setPlayers([...players, name.trim()]);
+    setName('');
   };
   
   const removePlayer = (idx: number) => setPlayers(players.filter((_, i) => i !== idx));

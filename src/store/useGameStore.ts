@@ -24,6 +24,7 @@ type GameState = {
   reviveRandom: () => void;
   nextRound: () => void;
   reset: () => void;
+  restart: () => void;
 
   //___ Broken Story slice ___
   storyDeck: typeof STORY_SEEDS;
@@ -94,6 +95,13 @@ export const useGameStore = create<GameState>((set, get) => ({
   nextRound: () => set((s) => ({ round: s.round + 1 })),
 
   reset: () => set({ alive: [], dead: [], phase: Phase.Lobby, round: 1, bsTurnIndex: 0}),
+
+  restart: () => {
+    const { alive, dead, initGame } = get();
+    const names = Array.from(new Set([...alive, ...dead]));
+    initGame(names);
+  },
+
 
   storyDeck: [] as unknown as typeof STORY_SEEDS,
   storyIndex: 0,

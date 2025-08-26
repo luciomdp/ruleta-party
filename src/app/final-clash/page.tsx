@@ -15,39 +15,45 @@ export default function FinalClashPage() {
   const router      = useRouter();
   const alive       = useGameStore(s => s.alive);
   const eliminate   = useGameStore(s => s.eliminate);
-  const reset       = useGameStore(s => s.reset);
 
-  // Intro
   const [showIntro, setShowIntro] = useState(true);
+  const [started, setStarted] = useState(false);
 
-  // Turno
   const [currentIdx, setCurrentIdx] = useState(0);
   const currentPlayer = alive[currentIdx] ?? '';
 
-  // Timer
   const START_SECONDS = 10;
   const [timeLeft, setTimeLeft] = useState(START_SECONDS);
   const [running, setRunning] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Letra fija al inicio
   const [letter] = useState<string>(
     () => LETTERS[Math.floor(Math.random() * LETTERS.length)]
   );
 
-  // Fin de intro
   useEffect(() => {
     const t = setTimeout(() => setShowIntro(false), 2200);
     return () => clearTimeout(t);
   }, []);
 
-  // Guardas
-  const winner = alive.length === 1 ? alive[0] : null;
   useEffect(() => {
     if (alive.length === 0) router.push('/');
   }, [alive.length, router]);
 
-  // Timer
+  const winner = alive.length === 1 ? alive[0] : null;
+
+  // Al haber ganador, parar timer y redirigir a /winner-page
+  useEffect(() => {
+    if (!winner) return;
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setRunning(false);
+    router.replace('/winner-page');
+  }, [winner, router]);
+
+  // loop del timer
   useEffect(() => {
     if (!running) return;
 
@@ -77,13 +83,28 @@ export default function FinalClashPage() {
     if (currentIdx >= alive.length && alive.length > 0) setCurrentIdx(0);
   }, [alive.length, currentIdx]);
 
-  const startOrNext = () => {
-    if (!running) {
-      setTimeLeft(START_SECONDS);
-      setRunning(true);
-    } else {
-      advanceTurn(false);
+  const stopTimer = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
+    setRunning(false);
+  };
+
+  const startTimer = () => {
+    setTimeLeft(START_SECONDS);
+    setRunning(true);
+  };
+
+  const advanceTurn = (fromTimeout: boolean) => {
+    stopTimer();
+    setTimeLeft(START_SECONDS);
+    setCurrentIdx(prev => {
+      if (alive.length === 0) return 0;
+      if (fromTimeout) return Math.min(prev, Math.max(alive.length - 1, 0));
+      return (prev + 1) % alive.length;
+    });
+    setRunning(true);
   };
 
   const handleExpire = () => {
@@ -92,30 +113,16 @@ export default function FinalClashPage() {
     advanceTurn(true);
   };
 
-  const advanceTurn = (fromTimeout: boolean) => {
-    setRunning(false);
-    setTimeLeft(START_SECONDS);
-    setCurrentIdx(prev => {
-      if (alive.length === 0) return 0;
-      if (fromTimeout) return Math.min(prev, Math.max(alive.length - 1, 0));
-      return (prev + 1) % alive.length;
-    });
-  };
-
-  const buttonLabel = useMemo(() => {
-    if (winner) return 'Reiniciar';
-    if (!running) return `Turno de ${currentPlayer || '—'}`;
-    return 'Siguiente';
-  }, [running, currentPlayer, winner]);
-
   const onButtonClick = () => {
-    if (winner) {
-      reset();
-      router.push('/');
+    if (!started) {
+      setStarted(true);
+      startTimer();
       return;
     }
-    startOrNext();
+    advanceTurn(false);
   };
+
+  const buttonLabel = useMemo(() => (started ? 'Siguiente' : 'Comenzar'), [started]);
 
   return (
     <main className={`h-[100dvh] overflow-hidden ${gradientBg} text-white`}>
@@ -144,68 +151,50 @@ export default function FinalClashPage() {
 
       <div className="h-full mx-auto max-w-md flex flex-col items-center p-6 gap-8 relative">
         <header className="w-full flex items-center justify-between">
-          <div className="text-white/80">Final Clash</div>
+          <div className="text-white/80 text-xl font-bold">Riña Final</div>
           <div className="text-3xl font-bold tabular-nums">
             {winner ? '—' : timeLeft}
           </div>
         </header>
 
-        {winner ? (
-          <section className="flex flex-col items-center justify-center gap-6 mt-16">
-            <Image
-              src="/icons/final-clash.png"
-              alt="Final Clash"
-              width={96}
-              height={96}
-              className="opacity-90"
-            />
-            <div className="text-center">
-              <h2 className="text-2xl font-bold">Ganador</h2>
-              <p className="text-xl mt-2">{winner}</p>
-            </div>
-            <button className={`px-4 py-3 ${glassBtn}`} onClick={onButtonClick}>
-              Reiniciar
-            </button>
-          </section>
-        ) : (
-          <>
-            <div className="flex-1 flex items-center justify-center">
-              <div className="size-40 rounded-full border border-white/30 flex items-center justify-center shadow-inner">
-                <span className="text-6xl font-extrabold leading-none select-none">
-                  {letter}
-                </span>
-              </div>
-            </div>
+        <p>Los 3 finalistas compiten por llevarse la <span className='font-bold'>Ruleta Crown 👑</span><br></br>Cada uno tiene 10 segundos para decir una palabra que comience con la letra en pantalla ¡Sin repetir! </p>
 
-            <div className="w-full flex flex-col items-center gap-4">
-              <div className="text-white/80">
-                Jugador actual: <span className="font-bold">{currentPlayer || '—'}</span>
-              </div>
-              <button className={`px-5 py-3 ${glassBtn}`} onClick={onButtonClick}>
-                {buttonLabel}
-              </button>
-              <p className="text-xs text-white/60">
-                Si se agota el tiempo, se elimina automáticamente.
-              </p>
-            </div>
+        {/* área principal*/}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="size-40 rounded-full border border-white/30 flex items-center justify-center shadow-inner">
+            <span className="text-6xl font-extrabold leading-none select-none">
+              {letter}
+            </span>
+          </div>
+        </div>
 
-            <div className="w-full mt-auto pb-4">
-              <h3 className="text-white/70 text-sm mb-2">En juego</h3>
-              <ul className="flex gap-2 flex-wrap">
-                {alive.map((n, i) => (
-                  <li
-                    key={n}
-                    className={`px-3 py-1 rounded-full text-sm ${
-                      i === currentIdx ? 'bg-white/30' : 'bg-white/10'
-                    }`}
-                  >
-                    {n}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </>
-        )}
+        <div className="w-full flex flex-col items-center gap-4">
+          <div className="text-white/80">
+            Jugador actual: <span className="font-bold">{currentPlayer || '—'}</span>
+          </div>
+          <button className={`px-5 py-3 ${glassBtn}`} onClick={onButtonClick}>
+            {buttonLabel}
+          </button>
+          <p className="text-xs text-white/60">
+            Si se agota el tiempo, se elimina automáticamente.
+          </p>
+        </div>
+
+        <div className="w-full mt-auto pb-4">
+          <h3 className="text-white/70 text-sm mb-2">En juego</h3>
+          <ul className="flex gap-2 flex-wrap">
+            {alive.map((n, i) => (
+              <li
+                key={n}
+                className={`px-3 py-1 rounded-full text-sm ${
+                  i === currentIdx ? 'bg-white/30' : 'bg-white/10'
+                }`}
+              >
+                {n}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <style jsx global>{`

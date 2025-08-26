@@ -17,14 +17,13 @@ export const SLICES: Slice[] = [
     iconSrc: '/icons/book.png',
     weight: 1
   },
-  //TODO cambiar a 1
   {
     key: SliceKey.HandsGame, 
     path: '/minigames/hands-game',
     label: 'Juego de manos', 
     color: '#34D399',
     iconSrc: '/icons/rock-paper-scissors.png',
-    weight: 100
+    weight: 1
   },
   {
     key: SliceKey.KillTheKing, 

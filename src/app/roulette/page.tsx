@@ -43,7 +43,7 @@ export default function RoulettePage() {
 
   return (
     <main className={`h-[100dvh] overflow-hidden ${gradientBg} text-white`}>
-      <div className="h-full mx-auto max-w-md flex flex-col items-center p-6 gap-6">
+      <div className="h-full min-h-0 mx-auto max-w-md flex flex-col items-center p-6 gap-6">
         {/* header */}
         <header className="w-full flex items-center justify-between">
           <div className="text-white/80">
@@ -64,6 +64,17 @@ export default function RoulettePage() {
           spinButtonText="Girar"
           className="flex flex-col items-center gap-4"
         />
+        
+        <div className="h-32 overflow-y-auto pr-1 pb-2 scroll-pb-4">
+          <h3 className="text-white/70 text-sm mb-2">En juego</h3>
+          <ul className="flex gap-2 flex-wrap /* sin mb-4 acá */">
+            {alive.map(n => (
+              <li key={n} className="px-3 py-1 rounded-full text-sm bg-white/10">
+                {n}
+              </li>
+            ))}
+          </ul>
+        </div>
 
         {/* confirm modal */}
         {showConfirm && (
