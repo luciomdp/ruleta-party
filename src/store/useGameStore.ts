@@ -19,7 +19,7 @@ type GameState = {
   phase: Phase;
   round: number;
   setPhase: (p: Phase) => void;         
-  innitGame: (names: string[]) => void;
+  initGame: (names: string[]) => void;
   eliminate: (name: string) => void;
   reviveRandom: () => void;
   nextRound: () => void;
@@ -45,16 +45,29 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   setPhase: (p) => set({ phase: p }),
 
-  innitGame: (names) =>
-    set({
-      alive: names,
-      dead: [],
-      phase: Phase.Roulette,
-      round: 1,
-      // inicializa historias al arrancar la partida
-      storyDeck: shuffle(STORY_SEEDS),
-      storyIndex: 0,
-    }),
+  initGame: (names) => {
+    const order = shuffle([...names]);
+
+    const nextName = (() => {
+      let i = 0;
+      return () => [
+        order[i++ % order.length],
+        order[i++ % order.length],
+        order[i++ % order.length],
+      ];
+    })();
+
+
+    const deck = shuffle(STORY_SEEDS).map(tpl => {
+      const [n1, n2, n3] = nextName();
+      return tpl
+        .replace(/<1>/g, n1 ?? 'Leo Messi')
+        .replace(/<2>/g, n2 ?? 'Michael Jackson')
+        .replace(/<3>/g, n3 ?? 'Donald Trump');
+    });
+
+    set({ alive: names, dead: [], phase: Phase.Roulette, round: 1, storyDeck: deck, storyIndex: 0 });
+  },
 
   eliminate: (name) =>
     set((s) => ({
@@ -86,7 +99,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   storyIndex: 0,
   currentStory: () => {
     const { storyDeck, storyIndex } = get();
-    return storyDeck[storyIndex] ?? null;
+    const story = storyDeck[storyIndex] ?? null;
+    if(!story) return 'Inventá tu propia historia!';
+    
+    return story;
   },
   advanceStory: () => {
     const { storyDeck, storyIndex } = get();

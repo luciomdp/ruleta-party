@@ -9,7 +9,7 @@ import { useGameStore } from '@/store/useGameStore';
 export default function Lobby() {
   const [name, setName] = useState('');
   const [players, setPlayers] = useState<string[]>([]);
-  const start = useGameStore(s => s.innitGame);
+  const start = useGameStore(s => s.initGame);
   const router = useRouter();
 
   const addPlayer = () => {

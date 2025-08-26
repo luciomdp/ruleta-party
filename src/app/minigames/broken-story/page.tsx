@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useGameStore, Phase } from '@/store/useGameStore';
 import TurnModal from '@/components/TurnModal';
 
-
+//TODO cambiar a 20
 const TURN_SECONDS = 2;
 
 export default function BrokenStoryPage() {
@@ -25,10 +25,9 @@ export default function BrokenStoryPage() {
   const [timeLeft, setTimeLeft] = useState(TURN_SECONDS);
 
   const onRoundEnd = () => {
-    console.log("Avanzo historia y elimino");
     setPhase(Phase.Elimination);
-    advanceStory();
     router.push('/elimination');
+    advanceStory();
   }
 
   // si cambia la lista de jugadores, resetear turnos
