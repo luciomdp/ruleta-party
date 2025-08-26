@@ -1,51 +1,62 @@
 // src/app/minigames/broken-story/page.tsx
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useGameStore } from '@/store/useGameStore';
+import { useGameStore, Phase } from '@/store/useGameStore';
 
-const TURN_SECONDS = 20;
+// TODO: poner en 20
+const TURN_SECONDS = 5;
 
 export default function BrokenStoryPage() {
   const router = useRouter();
-  const current = useGameStore(s => s.currentStory);
-  const draw = useGameStore(s => s.drawStorySeed);
-  const alive = useGameStore(s => s.alive);
 
-  useEffect(() => {
-    if (!current) draw();
-  }, [current, draw]);
+  // store
+  const story       = useGameStore(s => s.currentStory);
+  const draw        = useGameStore(s => s.drawStorySeed);
+  const players     = useGameStore(s => s.alive);
+  const turnIndex   = useGameStore(s => s.bsTurnIndex);
+  const nextTurn    = useGameStore(s => s.bsNext);
+  const resetTurns  = useGameStore(s => s.bsReset);
+  const setPhase    = useGameStore(s => s.setPhase);
 
-
-  const order = useMemo(() => alive, [alive]);
-  const [idx, setIdx] = useState(0);          // jugador actual
+  // local
   const [playing, setPlaying] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TURN_SECONDS);
 
+  // seed inicial
+  useEffect(() => { 
+    if (!story) draw(); 
+  }, [story, draw]);
+
+  // si cambia la lista de jugadores, resetear turnos
+  useEffect(() => { 
+    resetTurns(); 
+    setPlaying(false); 
+    setTimeLeft(TURN_SECONDS); 
+  }, [players, resetTurns]);
+
   const startTurn = () => {
-    if (!order.length || idx >= order.length) return;
+    if (!players.length || turnIndex >= players.length) return;
     setTimeLeft(TURN_SECONDS);
     setPlaying(true);
   };
 
+  // timer
   useEffect(() => {
     if (!playing) return;
-    const t = setInterval(() => {
-      setTimeLeft(tl => {
-        if (tl <= 1) {
-          clearInterval(t);
-          setPlaying(false);
-          setIdx(i => i + 1);
-          return TURN_SECONDS;
-        }
-        return tl - 1;
-      });
-    }, 1000);
-    return () => clearInterval(t);
-  }, [playing]);
+    if (timeLeft <= 0) {
+      setPlaying(false);
+      nextTurn();
+      setTimeLeft(TURN_SECONDS);
+      return;
+    }
+    const t = setTimeout(() => setTimeLeft(tl => tl - 1), 1000);
+    return () => clearTimeout(t);
+  }, [playing, timeLeft, nextTurn]);
 
-  const allPlayed = order.length > 0 && idx >= order.length;
+  const allPlayed = players.length > 0 && turnIndex >= players.length;
+  const currentName = players.length && turnIndex < players.length ? players[turnIndex] : '';
 
   return (
     <main className="h-[100dvh] bg-gradient-to-br from-purple-700 via-pink-600 to-red-500 text-white">
@@ -69,7 +80,7 @@ export default function BrokenStoryPage() {
             <div className="rounded-xl bg-white/10 border border-white/20 p-3 shadow">
               <div className="relative">
                 <span className="absolute -left-2 -top-3 text-5xl text-white/20 select-none">“</span>
-                <blockquote className="text-lg pl-4">{current ?? '…'}</blockquote>
+                <blockquote className="text-lg pl-4">{story ?? '…'}</blockquote>
               </div>
             </div>
 
@@ -79,20 +90,19 @@ export default function BrokenStoryPage() {
           </div>
         </section>
 
-        {/* Botones */}
         <footer className="pt-1 mt-2 space-y-2">
-          {!allPlayed && order.length > 0 && (
+          {!allPlayed && players.length > 0 && (
             <button
               type="button"
               onClick={startTurn}
               className="w-full rounded-xl py-3 font-semibold border border-white/15 shadow bg-white/15 hover:bg-white/20 active:bg-white/25 transition"
             >
-              Turno de <span className="font-bold">{order[idx]}</span>
+              Turno de <span className="font-bold">{currentName}</span>
             </button>
           )}
 
           <button
-            onClick={() => router.push('/elimination')}
+            onClick={() => { setPhase(Phase.Elimination); router.push('/elimination'); }}
             disabled={!allPlayed}
             className={`w-full rounded-xl py-3 font-semibold border shadow transition
               ${!allPlayed
@@ -104,18 +114,17 @@ export default function BrokenStoryPage() {
         </footer>
       </div>
 
-      {/* Modal */}
       {playing && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/60">
           <div className="w-full max-w-sm rounded-2xl border border-white/20 p-6 text-white shadow-2xl backdrop-blur bg-white/10">
             <div className="mb-3 text-sm opacity-85">
-              Turno de <span className="font-semibold">{order[idx]}</span>
+              Turno de <span className="font-semibold">{currentName}</span>
             </div>
 
             <div className="rounded-xl bg-white/10 border border-white/20 p-4 mb-4">
               <div className="relative">
                 <span className="absolute -left-2 -top-4 text-5xl text-white/20 select-none">“</span>
-                <blockquote className="text-lg pl-4">{current ?? '…'}</blockquote>
+                <blockquote className="text-lg pl-4">{story ?? '…'}</blockquote>
               </div>
             </div>
 

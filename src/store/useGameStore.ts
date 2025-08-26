@@ -25,16 +25,21 @@ type GameState = {
   dead: string[];
   phase: Phase;
   round: number;
+  setPhase: (p: Phase) => void;         
   setNames: (names: string[]) => void;
   eliminate: (name: string) => void;
   reviveRandom: () => void;
   nextRound: () => void;
   reset: () => void;
 
+  // --- Broken Story slice ---
   storyDeck: number[];
   currentStory?: string;
-  storyDrawn: boolean;          // NUEVO
+  storyDrawn: boolean;          
   drawStorySeed: () => string; 
+  bsTurnIndex: number;                    // NUEVO
+  bsReset: () => void;                    // NUEVO
+  bsNext: () => void;                     // NUEVO
 };
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -42,6 +47,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   dead: [],
   phase: Phase.Lobby,
   round: 1,
+
+  setPhase: (p) => set({ phase: p }),
 
   setNames: (names) =>
     set({ alive: names, dead: [], phase: Phase.Roulette, round: 1, storyDrawn: false }),
@@ -91,4 +98,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ storyDeck: rest, currentStory: text, storyDrawn: true });
     return text;
   },
+  bsTurnIndex: 0,
+  bsReset: () => set({ bsTurnIndex: 0 }),
+  bsNext: () => set(s => ({ bsTurnIndex: s.bsTurnIndex + 1 })),
 }));
