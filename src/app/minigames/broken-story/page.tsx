@@ -42,6 +42,13 @@ export default function BrokenStoryPage() {
     setPlaying(true);
   };
 
+  const endTurn = () => {
+    setPlaying(false);
+    nextTurn();
+    setTimeLeft(TURN_SECONDS);
+  };
+
+
   // timer
   useEffect(() => {
     if (!playing) return;
@@ -118,7 +125,8 @@ export default function BrokenStoryPage() {
         open={playing}
         playerName={currentName}
         story={story ?? ''}
-        timeLeft={timeLeft}
+        timeLeft={timeLeft} 
+        onSkip={endTurn}      
       />
     </main>
   );
