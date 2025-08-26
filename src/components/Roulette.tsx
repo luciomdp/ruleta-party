@@ -1,8 +1,14 @@
 // components/RouletteLib.tsx
 'use client';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Wheel } from 'react-custom-roulette';
+import dynamic from 'next/dynamic';
 import type { Slice, SliceKey } from '@/lib/types';
+
+// evita evaluar react-custom-roulette en SSR/BUILD
+const Wheel = dynamic(
+  () => import('react-custom-roulette').then(m => m.Wheel),
+  { ssr: false }
+);
 
 type Props = {
   slices: Slice[];
@@ -25,7 +31,7 @@ export default function RouletteLib({
       slices.map(s => ({
         option: s.label,
         style: { backgroundColor: s.color },
-        image: { uri: s.iconSrc, sizeMultiplier: 0.8 },
+        image: s.iconSrc ? { uri: s.iconSrc, sizeMultiplier: 0.8 } : undefined,
       })),
     [slices]
   );
@@ -44,10 +50,9 @@ export default function RouletteLib({
   };
 
   const spin = useCallback(() => {
-    if (spinning || disabled) return;
-    if (!slices || slices.length === 0) return;
+    if (spinning || disabled || !slices.length) return;
     const idx = weightedIndex(slices);
-    resultKeyRef.current = slices[idx].key; // snapshot del ganador
+    resultKeyRef.current = slices[idx].key;
     setPrize(idx);
     setSpinning(true);
   }, [spinning, disabled, slices]);
