@@ -4,16 +4,19 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGameStore, Phase } from '@/store/useGameStore';
+import TurnModal from '@/components/TurnModal';
 
-// TODO: poner en 20
-const TURN_SECONDS = 5;
+//TODO poner en 20
+const TURN_SECONDS = 2;
 
 export default function BrokenStoryPage() {
   const router = useRouter();
 
   // store
-  const story       = useGameStore(s => s.currentStory);
-  const draw        = useGameStore(s => s.drawStorySeed);
+  const story      = useGameStore(s => s.currentStory);
+  //TODO: Fix [storie]: <Resolver el problema de que no se actualiza la historia entre rondas>
+  const ensureSeed = useGameStore(s => s.ensureStory);
+  
   const players     = useGameStore(s => s.alive);
   const turnIndex   = useGameStore(s => s.bsTurnIndex);
   const nextTurn    = useGameStore(s => s.bsNext);
@@ -24,10 +27,9 @@ export default function BrokenStoryPage() {
   const [playing, setPlaying] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TURN_SECONDS);
 
-  // seed inicial
   useEffect(() => { 
-    if (!story) draw(); 
-  }, [story, draw]);
+    if (!story) ensureSeed();
+  }, [story, ensureSeed]);
 
   // si cambia la lista de jugadores, resetear turnos
   useEffect(() => { 
@@ -69,11 +71,11 @@ export default function BrokenStoryPage() {
           <div className="rounded-2xl p-5 leading-relaxed backdrop-blur space-y-5">
             <div className="space-y-2">
               <p>
-                Construyan una historia por turnos. Cada jugador dispone de
+                Cada jugador dispone de
                 <span className="font-semibold"> 20&nbsp;segundos</span> para construir una historia con la frase en pantalla.
               </p>
               <p>
-                Al final, deberán votar la aportación menos creativa o coherente; esa persona queda eliminada.
+                Al final, deberán eliminar a quien haya hecho la aportación menos creativa o coherente.
               </p>
             </div>
 
@@ -114,32 +116,12 @@ export default function BrokenStoryPage() {
         </footer>
       </div>
 
-      {playing && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/60">
-          <div className="w-full max-w-sm rounded-2xl border border-white/20 p-6 text-white shadow-2xl backdrop-blur bg-white/10">
-            <div className="mb-3 text-sm opacity-85">
-              Turno de <span className="font-semibold">{currentName}</span>
-            </div>
-
-            <div className="rounded-xl bg-white/10 border border-white/20 p-4 mb-4">
-              <div className="relative">
-                <span className="absolute -left-2 -top-4 text-5xl text-white/20 select-none">“</span>
-                <blockquote className="text-lg pl-4">{story ?? '…'}</blockquote>
-              </div>
-            </div>
-
-            <div className="text-center text-5xl font-bold tabular-nums">{timeLeft}s</div>
-
-            <button
-              type="button"
-              onClick={() => setPlaying(false)}
-              className="mt-6 w-full rounded-xl bg-white/15 hover:bg-white/20 active:bg-white/25 border border-white/25 px-4 py-3 transition"
-            >
-              Salir
-            </button>
-          </div>
-        </div>
-      )}
+      <TurnModal
+        open={playing}
+        playerName={currentName}
+        story={story}
+        timeLeft={timeLeft}
+      />
     </main>
   );
 }

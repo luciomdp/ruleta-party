@@ -36,7 +36,7 @@ type GameState = {
   storyDeck: number[];
   currentStory?: string;
   storyDrawn: boolean;          
-  drawStorySeed: () => string; 
+  ensureStory: () => void; 
   bsTurnIndex: number;                    // NUEVO
   bsReset: () => void;                    // NUEVO
   bsNext: () => void;                     // NUEVO
@@ -83,21 +83,26 @@ export const useGameStore = create<GameState>((set, get) => ({
   currentStory: undefined,
   storyDrawn: false,
 
-  drawStorySeed: () => {
-    const { storyDrawn, storyDeck } = get();
+  ensureStory: () => {
+    set((s) => {
+      if (s.storyDrawn) return s;
 
-    // si ya se sorteó una, devolvemos la actual
-    if (storyDrawn) {
-      return get().currentStory ?? '';
-    }
+      // init deck si está vacío
+      const deck = s.storyDeck.length
+        ? s.storyDeck.slice()
+        : shuffle([...Array(STORY_SEEDS.length).keys()]);
 
-    let deck = storyDeck;
-    if (deck.length === 0) deck = shuffle([...Array(STORY_SEEDS.length).keys()]);
-    const [idx, ...rest] = deck;
-    const text = STORY_SEEDS[idx];
-    set({ storyDeck: rest, currentStory: text, storyDrawn: true });
-    return text;
+      const [i, ...rest] = deck;
+      const text = STORY_SEEDS[i];
+
+      return {
+        storyDeck: rest,
+        currentStory: text,
+        storyDrawn: true,
+      };
+    });
   },
+
   bsTurnIndex: 0,
   bsReset: () => set({ bsTurnIndex: 0 }),
   bsNext: () => set(s => ({ bsTurnIndex: s.bsTurnIndex + 1 })),
