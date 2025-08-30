@@ -19,9 +19,3 @@ services:
       - NODE_ENV=development
       - PORT=3000
     command: sh -c "npm run dev"
-    networks:
-      - Publica
-  
-networks:
-    Publica:
-        external: true

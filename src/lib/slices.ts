@@ -23,7 +23,7 @@ export const SLICES: Slice[] = [
     label: 'Juego de manos', 
     color: '#34D399',
     iconSrc: '/icons/rock-paper-scissors.png',
-    weight: 1
+    weight: 0.6
   },
   {
     key: SliceKey.KillTheKing, 
@@ -31,7 +31,7 @@ export const SLICES: Slice[] = [
     label: 'Muerte al Rey', 
     color: '#FBBF24',
     iconSrc: '/icons/king.png',
-    weight: 1
+    weight: 0.6
   },
   {
     key: SliceKey.Revive, 
@@ -39,6 +39,6 @@ export const SLICES: Slice[] = [
     label: 'De entre los muertos', 
     color: '#60A5FA',
     iconSrc: '/icons/grave.png',
-    weight: 0.2
+    weight: 0.3
   },
 ];
